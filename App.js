@@ -1,8 +1,8 @@
-import React from 'react';
-import Search from './screens/search';
+import React from "react";
+import Navigation from "./navigation/navigation";
 
 export default function App() {
   return (
-    <Search/>
+    <Navigation />
   );
 }

@@ -9,7 +9,7 @@ class FilmItem extends React.Component {
     return (
       <TouchableOpacity
         style={styles.container}
-        onPress={() => {console.log('On passe aux détails');} /*displayDetailsForMovie(film)*/}>
+        onPress={() => {displayDetailsForMovie(film.id)}}>
         <Image
           style={styles.image}
           source={{ uri: getImageFromApi(film.backdrop_path) }}
