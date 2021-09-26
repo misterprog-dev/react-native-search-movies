@@ -6,7 +6,7 @@ import { getFilmsFromApiWithSearchedText } from '../api/TMDB-api';
 class Search extends React.Component {
 
   /**
-  * Constructeur
+  * Constructeur par défaut.
   **/
   constructor(props) {
     super(props);
@@ -42,6 +42,7 @@ class Search extends React.Component {
 
   /**
   * Permet d'afficher un toast.
+  * 
   * @param message le message à afficher dans le toast.
   **/
   _showToast(message) {
@@ -81,22 +82,25 @@ class Search extends React.Component {
   * Permet de lancer la recherche de films.
   **/
   _SearchFilm() {
-    this.page = 0;
-    this.totalPages = 0;
-    this.setState({
-      isLoading: true,
-      films: []
-    }, () => {
-      this._loadFilms();
-    });
+    if (this.searchedText.trim().length > 0) {
+      this.page = 0;
+      this.totalPages = 0;
+      this.setState({
+        isLoading: true,
+        films: []
+      }, () => {
+        this._loadFilms();
+      });
+    }
   }
 
   /**
   * Permet de visualiser les détails d'un film.
-  * @param film le film à détailler.
+  * 
+  * @param filmId l'id du film à détailler.
   **/
-  _displayDetailsForMovie = (film) => {
-    this.props.navigation.navigate('FilmDetails', { film: film });
+  _displayDetailsForMovie = (filmId) => {
+    this.props.navigation.navigate('FilmDetails', { filmId: filmId });
   }
 
   // Le rendu de l'application
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 10,
-    marginTop: 40
+    marginTop: 5
   },
   input: {
     height: 40,

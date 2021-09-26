@@ -15,6 +15,18 @@ export function getFilmsFromApiWithSearchedText(text, page) {
 }
 
 /**
+ * Permet de récupérer les détails d'un film.
+ * 
+ * @param id l'id du film à récupérer. 
+ * @return le film à récupérer.
+ */
+export function getFilmDetailsFromApi(id) {
+  return fetch('https://api.themoviedb.org/3/movie/' + id +'?api_key=' + API_TOKEN + '&language=fr')
+    .then((response) => response.json())
+    .catch((error) => console.log('Error recherche détails film : ', error));
+}
+
+/**
 * Permet de récupérer le nom de l'image avec l'api
 *
 * @param name le nom de l'image.
