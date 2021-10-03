@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import {
   SafeAreaView,
   Text,
@@ -7,6 +8,7 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import moment from "moment";
 import numeral from "numeral";
@@ -53,6 +55,35 @@ class FilmDetails extends React.Component {
   }
 
   /**
+   * Gestion de favoris
+   */
+  _toggleFavorite() {
+    const action = {
+      type: "TOGGLE_FAVORITE",
+      value: this.state.film,
+    };
+    this.props.dispatch(action);
+  }
+
+  /**
+   * Construire une image de favoris.
+   *
+   * @return Image favorite
+   */
+  _displayFavoriteImage() {
+    var sourceImage = require("../assets/images/ic_favorite_border.png");
+    if (
+      this.props.favoritesFilm.findIndex(
+        (item) => item.id === this.state.film.id
+      ) !== -1
+    ) {
+      // Film dans nos favoris
+      sourceImage = require("../assets/images/ic_favorite.png");
+    }
+    return <Image style={styles.favoriteImage} source={sourceImage} />;
+  }
+
+  /**
    * Permet d'afficher le film.
    */
   _displayMovie() {
@@ -68,6 +99,12 @@ class FilmDetails extends React.Component {
           </View>
           <View style={styles.containerInfo}>
             <Text style={styles.filmTitle}>{film.title}</Text>
+            <TouchableOpacity
+              onPress={() => this._toggleFavorite()}
+              style={styles.favoriteContainer}
+            >
+              {this._displayFavoriteImage()}
+            </TouchableOpacity>
             <Text style={styles.descriptionFilm}>{film.overview}</Text>
             <Text style={styles.defaultText}>
               Sorti le{" "}
@@ -124,6 +161,10 @@ class FilmDetails extends React.Component {
       });
   }
 
+  componentDidUpdate() {
+    console.log(this.props.favoritesFilm);
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -148,11 +189,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   scrollContainer: {
-    flex: 1
+    flex: 1,
   },
   imageBackground: {
     backgroundColor: "#f9c2ff",
-    height: "60%"
+    height: "60%",
   },
   image: {
     borderWidth: 2,
@@ -166,7 +207,7 @@ const styles = StyleSheet.create({
   },
   containerInfo: {
     marginLeft: "2%",
-    marginRight: "2%"
+    marginRight: "2%",
   },
   filmTitle: {
     fontSize: 16,
@@ -185,6 +226,20 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 15,
   },
+  favoriteContainer: {
+    alignItems: "center",
+  },
+  favoriteImage: {
+    width: 40,
+    height: 40,
+  },
 });
 
-export default FilmDetails;
+// On connecte le state de notre application au component FilmDetail.
+function mapStateToProps(state) {
+  return {
+    favoritesFilm: state.favoritesFilm,
+  };
+}
+
+export default connect(mapStateToProps)(FilmDetails);
