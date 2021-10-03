@@ -1,35 +1,44 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet, View, TextInput, Button, FlatList, ActivityIndicator, ToastAndroid } from 'react-native';
-import FilmItem from '../components/film-item';
-import { getFilmsFromApiWithSearchedText } from '../api/TMDB-api';
+import React from "react";
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  TextInput,
+  Button,
+  FlatList,
+  ActivityIndicator,
+  ToastAndroid,
+} from "react-native";
+import { connect } from "react-redux";
+import FilmItem from "../components/film-item";
+import { getFilmsFromApiWithSearchedText } from "../api/TMDB-api";
 
 class Search extends React.Component {
-
   /**
-  * Constructeur par défaut.
-  **/
+   * Constructeur par défaut.
+   **/
   constructor(props) {
     super(props);
-    this.searchedText = '';
+    this.searchedText = "";
     this.page = 0;
     this.totalPages = 0;
     this.state = {
       films: [],
-      isLoading: false
+      isLoading: false,
     };
   }
 
   /**
-  * Permet de modifier la variable modifiant le texte saisi dans le input.
-  * @param text le text à récupérer pour la recherche.
-  **/
+   * Permet de modifier la variable modifiant le texte saisi dans le input.
+   * @param text le text à récupérer pour la recherche.
+   **/
   _searchedTextInputChanged(text) {
     this.searchedText = text;
   }
 
   /**
-  * Permet d'afficher le loading.
-  **/
+   * Permet d'afficher le loading.
+   **/
   _displayLoading() {
     if (this.state.isLoading) {
       return (
@@ -41,10 +50,10 @@ class Search extends React.Component {
   }
 
   /**
-  * Permet d'afficher un toast.
-  * 
-  * @param message le message à afficher dans le toast.
-  **/
+   * Permet d'afficher un toast.
+   *
+   * @param message le message à afficher dans le toast.
+   **/
   _showToast(message) {
     ToastAndroid.showWithGravityAndOffset(
       message,
@@ -53,55 +62,67 @@ class Search extends React.Component {
       25,
       50
     );
-  };
+  }
 
   /**
-  * Permet de faire à l'api pour la recherche de films.
-  **/
+   * Permet de faire à l'api pour la recherche de films.
+   **/
   _loadFilms() {
     if (this.searchedText.length > 0) {
-      getFilmsFromApiWithSearchedText(this.searchedText, this.page + 1).then((response) => {
-        if (response.results.length == 0) {
-          { this._showToast('Aucun résultat !') }
-        }
-        else {
-          this.page = response.page;
-          this.totalPages = response.total_pages;
-          this.setState({ films: [...this.state.films, ...response.results] });
-        }
-        this.setState({ isLoading: false });
-      }).catch((error) => {
-        this.setState({ isLoading: false });
-        // On affiche notre erreur dans un toast.
-        { this._showToast('Une erreur est survenu, vérifier votre connexion internet !') }
-      });
+      getFilmsFromApiWithSearchedText(this.searchedText, this.page + 1)
+        .then((response) => {
+          if (response.results.length == 0) {
+            {
+              this._showToast("Aucun résultat !");
+            }
+          } else {
+            this.page = response.page;
+            this.totalPages = response.total_pages;
+            this.setState({
+              films: [...this.state.films, ...response.results],
+            });
+          }
+          this.setState({ isLoading: false });
+        })
+        .catch((error) => {
+          this.setState({ isLoading: false });
+          // On affiche notre erreur dans un toast.
+          {
+            this._showToast(
+              "Une erreur est survenu, vérifier votre connexion internet !"
+            );
+          }
+        });
     }
   }
 
   /**
-  * Permet de lancer la recherche de films.
-  **/
+   * Permet de lancer la recherche de films.
+   **/
   _SearchFilm() {
     if (this.searchedText.trim().length > 0) {
       this.page = 0;
       this.totalPages = 0;
-      this.setState({
-        isLoading: true,
-        films: []
-      }, () => {
-        this._loadFilms();
-      });
+      this.setState(
+        {
+          isLoading: true,
+          films: [],
+        },
+        () => {
+          this._loadFilms();
+        }
+      );
     }
   }
 
   /**
-  * Permet de visualiser les détails d'un film.
-  * 
-  * @param filmId l'id du film à détailler.
-  **/
+   * Permet de visualiser les détails d'un film.
+   *
+   * @param filmId l'id du film à détailler.
+   **/
   _displayDetailsForMovie = (filmId) => {
-    this.props.navigation.navigate('FilmDetails', { filmId: filmId });
-  }
+    this.props.navigation.navigate("FilmDetails", { filmId: filmId });
+  };
 
   // Le rendu de l'application
   render() {
@@ -109,15 +130,15 @@ class Search extends React.Component {
       <SafeAreaView style={styles.container}>
         <View>
           <TextInput
-            mode='outlined'
-            label='Titre du film'
+            mode="outlined"
+            label="Titre du film"
             style={styles.input}
-            placeholder='Titre du film'
+            placeholder="Titre du film"
             onChangeText={(text) => this._searchedTextInputChanged(text)}
             onSubmitEditing={() => this._SearchFilm()}
           />
           <Button
-            title='Rechercher'            
+            title="Rechercher"
             disable={this.searchedText.length < 1}
             onPress={() => this._SearchFilm()}
           />
@@ -127,7 +148,21 @@ class Search extends React.Component {
         <FlatList
           data={this.state.films}
           keyExtractor={(film) => film.id.toString()}
-          renderItem={({ item }) => <FilmItem film={item} displayDetailsForMovie={this._displayDetailsForMovie} />}
+          extraData={this.props.favoritesFilm}
+          renderItem={({ item }) => (
+            <FilmItem
+              film={item}
+              displayDetailsForMovie={this._displayDetailsForMovie}
+              // Ajout d'une props isFilmFavorite pour indiquer à l'item d'afficher une image favoris ou non.
+              isFilmFavorite={
+                this.props.favoritesFilm.findIndex(
+                  (film) => film.id === item.id
+                ) !== -1
+                  ? true
+                  : false
+              }
+            />
+          )}
           onEndReachedThreshold={0.5}
           onEndReached={() => {
             if (this.page < this.totalPages) {
@@ -137,7 +172,6 @@ class Search extends React.Component {
         />
 
         {this._displayLoading()}
-
       </SafeAreaView>
     );
   }
@@ -147,28 +181,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 10,
-    marginTop: 5
+    marginTop: 5,
   },
   input: {
     height: 40,
     borderWidth: 1,
     padding: 5,
-    marginBottom: 10
+    marginBottom: 10,
   },
   separator: {
     marginVertical: 8,
-    borderBottomColor: '#000000',
+    borderBottomColor: "#000000",
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   containerLoading: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     bottom: 100,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
-export default Search;
+// On connecte le store Redux, ainsi que les films favoris du state de notre application, à notre component Search.
+function mapStateToProps(state) {
+  return {
+    favoritesFilm: state.favoritesFilm,
+  };
+}
+
+export default connect(mapStateToProps)(Search);
