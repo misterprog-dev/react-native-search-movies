@@ -162,7 +162,7 @@ class FilmDetails extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.favoritesFilm);
+    // Lorsque le component se met à jour !
   }
 
   render() {
