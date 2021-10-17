@@ -7,7 +7,7 @@ import Search from "../screens/search";
 import FilmDetails from "../screens/film-details";
 import Favorite from "../screens/favorite";
 
-// Pour le snack navigator
+// Pour le stack navigator rechercher
 const Stack = createStackNavigator();
 
 const StackNavigatorSearch = () => {
@@ -28,6 +28,30 @@ const StackNavigatorSearch = () => {
         }}
       />
     </Stack.Navigator>
+  );
+}
+
+// Pour le stack navigator favoris
+const StackFavoris = createStackNavigator();
+
+const StackNavigatorFavoris = () => {
+  return (
+    <StackFavoris.Navigator>
+      <StackFavoris.Screen
+        name="Favoris"
+        component={Favorite}
+        options={{
+          title: "Favoris"
+        }}
+      />
+      <StackFavoris.Screen
+        name="FilmDetails"
+        component={FilmDetails}
+        options={{
+          title: "Détails film"
+        }}
+      />
+    </StackFavoris.Navigator>
   );
 }
 
@@ -52,7 +76,7 @@ function TabNavigator() {
           tabBarShowLabel: false
         }} />
       <Tab.Screen name="TabFavorites" 
-        component={Favorite}
+        component={StackNavigatorFavoris}
         options={{
           title: "Favoris",
           tabBarIcon: () => {

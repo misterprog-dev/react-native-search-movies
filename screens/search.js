@@ -5,12 +5,9 @@ import {
   View,
   TextInput,
   Button,
-  FlatList,
   ActivityIndicator,
   ToastAndroid,
 } from "react-native";
-import { connect } from "react-redux";
-import FilmItem from "../components/film-item";
 import FilmList from "../components/film-list";
 import { getFilmsFromApiWithSearchedText } from "../api/TMDB-api";
 
@@ -27,6 +24,8 @@ class Search extends React.Component {
       films: [],
       isLoading: false,
     };
+
+    this._loadFilms = this._loadFilms.bind(this);
   }
 
   /**
